@@ -35,7 +35,9 @@ message(STATUS "TORCH_CXX_FLAGS = [${TORCH_CXX_FLAGS}]")
 # 加新的 .cpp 就在这里加一行。CMake 不会自动扫目录。
 set(APP_SOURCES
     "src/DKD_C++.h"
-    "src/DKD_C++.cpp")
+    "src/DKD_C++.cpp" 
+    "src/data/cifar100.h"
+    "src/data/cifar100.cpp")
 add_executable(DKD_C++ ${APP_SOURCES})
 
 # ==================== target 属性（必须在 add_executable 之后）====================

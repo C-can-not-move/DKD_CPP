@@ -1,8 +1,15 @@
 ﻿// DKD_C++.h: 标准系统包含文件的包含文件
-// 或项目特定的包含文件。
+
+// window 控制台显示 utf-8
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #pragma once
 
 #include <iostream>
+#include <string>
 
-// TODO: 在此处引用程序需要的其他标头。
+#include <torch/torch.h>
+
+#include "data/cifar100.h"
