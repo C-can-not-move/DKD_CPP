@@ -64,6 +64,6 @@ namespace dkd::model
     // 学生
     ResNet h_resnet8x4(int64_t num_classes = 100);
 
-	// 备用的老师，项目准备走预训练模型路线，暂时不需要。
+	// 备用的老师，项目准备走python预训练->C++加载模型的路线，暂时不需要。
     ResNet h_resnet32x4(int64_t num_classes = 100);
 }  // namespace dkd::model

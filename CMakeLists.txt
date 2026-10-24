@@ -37,9 +37,13 @@ set(APP_SOURCES
     "src/DKD_C++.h"
     "src/DKD_C++.cpp" 
     "src/data/cifar100.h"
-    "src/data/cifar100.cpp" 
+    "src/data/cifar100.cpp"  
+    "src/data/transforms.h"
+    "src/data/transforms.cpp"
     "src/model/resnet.h"
-    "src/model/resnet.cpp")
+    "src/model/resnet.cpp" 
+    "src/kd/loss.cpp" 
+    "src/kd/loss.h")
 add_executable(DKD_C++ ${APP_SOURCES})
 
 # ==================== target 属性（必须在 add_executable 之后）====================
