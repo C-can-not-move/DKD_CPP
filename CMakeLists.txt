@@ -36,14 +36,18 @@ message(STATUS "TORCH_CXX_FLAGS = [${TORCH_CXX_FLAGS}]")
 set(APP_SOURCES
     "src/DKD_C++.h"
     "src/DKD_C++.cpp" 
+    "src/config.h"
+    "src/config.cpp"
     "src/data/cifar100.h"
     "src/data/cifar100.cpp"  
     "src/data/transforms.h"
     "src/data/transforms.cpp"
     "src/model/resnet.h"
     "src/model/resnet.cpp" 
+    "src/kd/loss.h" 
     "src/kd/loss.cpp" 
-    "src/kd/loss.h")
+    "src/train/trainer.h"
+    "src/train/trainer.cpp")
 add_executable(DKD_C++ ${APP_SOURCES})
 
 # ==================== target 属性（必须在 add_executable 之后）====================
