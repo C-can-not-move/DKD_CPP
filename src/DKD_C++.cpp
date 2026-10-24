@@ -10,34 +10,29 @@ int main()
 #endif
 
     try
-    {
-        const auto tr = dkd::data::load_cifar100_bin(kDataDir, /*train=*/true);
-        const auto te = dkd::data::load_cifar100_bin(kDataDir, /*train=*/false);
+	{
+		auto s = dkd::model::h_resnet8x4(100);
+		auto t = dkd::model::h_resnet32x4(100);
 
-        std::cout << "train images " << tr.images.sizes() << "  " << tr.images.scalar_type() << "\n";
-        std::cout << "train labels " << tr.labels.sizes() << "  " << tr.labels.scalar_type() << "\n";
-        std::cout << "test  images " << te.images.sizes() << "\n";
-        std::cout << "test  labels " << te.labels.sizes() << "\n";
+		const auto count = [](const dkd::model::ResNet& net)
+			{
+				int64_t n = 0;
+				for (const auto& p : net->parameters()) n += p.numel();
+				return n;
+			};
 
-        std::cout << "label  min " << tr.labels.min().item<int64_t>()
-            << "  max " << tr.labels.max().item<int64_t>() << "\n";
-        std::cout << "pixel  min " << tr.images.min().item<int64_t>()
-            << "  max " << tr.images.max().item<int64_t>() << "\n";
+		std::cout << "resnet8x4  参数量 " << count(s) << "  （期望 1,233,540）\n";
+		std::cout << "resnet32x4 参数量 " << count(t) << "  （期望 7,433,860）\n"; 
 
-        // RGB 平面排布，前 8 个是 R 平面的前 8 个
-        std::cout << "第一张前 8 个像素 "
-            << tr.images[0].flatten().slice(0, 0, 8) << "\n";
+		auto x = torch::zeros({ 2, 3, 32, 32 });
+		auto y = s->forward(x);
+		std::cout << "logits " << y.sizes() << "  " << y.scalar_type() << "\n";
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "ERROR: " << e.what() << "\n";
+		return 1;
+	}
+	return 0;
 
-        // 每类计数：训练集 100 类应全部等于 500
-        auto counts = torch::zeros({ 100 }, torch::TensorOptions().dtype(torch::kInt64));
-        counts.scatter_add_(0, tr.labels, torch::ones_like(tr.labels));
-        std::cout << "每类计数 min " << counts.min().item<int64_t>()
-            << "  max " << counts.max().item<int64_t>() << "\n";
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "ERROR: " << e.what() << "\n";
-        return 1;
-    }
-    return 0;
 }

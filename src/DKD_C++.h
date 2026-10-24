@@ -13,3 +13,4 @@
 #include <torch/torch.h>
 
 #include "data/cifar100.h"
+#include "model/resnet.h"
