@@ -46,10 +46,18 @@ namespace dkd::train
 		const auto norm = cifar100_norm();
 
 		TrainResult res;
-		const int64_t N = train_images.size(0);
+		const int64_t N = train_images.size(0);   
 
 		for (int64_t epoch = 1; epoch <= cfg.epochs; ++epoch)
 		{
+			// 到指定轮就把 lr 乘一次 decay_rate
+			// （mdistiller 用 epoch > stage，第 151 轮才生效；这里差一轮，忽略）
+			if (std::find(cfg.lr_decay_stages.begin(), cfg.lr_decay_stages.end(), epoch)!= cfg.lr_decay_stages.end())
+			{
+				for (auto& g : optimizer.param_groups())
+					g.options().set_lr(g.options().get_lr() * cfg.lr_decay_rate);
+			}
+
 			// BN 要用批统计 ⇒ train()
 			model->train();
 
@@ -101,6 +109,7 @@ namespace dkd::train
 			}
 
 			std::cout << "[epoch " << epoch << "/" << cfg.epochs << "]"
+				<< "   lr " << optimizer.param_groups().front().options().get_lr()
 				<< "   train_loss " << res.last_train_loss
 				<< "   val_acc " << acc
 				<< "   (" << eval_result.correct << "/" << eval_result.total << ")\n";

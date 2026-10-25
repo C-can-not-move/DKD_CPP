@@ -10,6 +10,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <vector>
 
 namespace dkd::train
 {
@@ -18,6 +19,8 @@ namespace dkd::train
 		int64_t epochs = 20;           // 官方是 240
 		int64_t batch_size = 64;       // mdistiller 的 CIFAR-100 配置
 		bool    drop_last = false;
+		std::vector<int64_t> lr_decay_stages;   // 例如 {150, 180, 210}；空 = 不衰减
+		double               lr_decay_rate = 0.1;
 		int64_t log_every = 50;
 		std::optional<std::string> save_path;
 
@@ -29,8 +32,15 @@ namespace dkd::train
 			std::cout << "[train-cfg] epochs     = " << epochs << '\n'
 				<< "[train-cfg] batch_size = " << batch_size << '\n'
 				<< "[train-cfg] drop_last  = " << (drop_last ? "true" : "false") << '\n'
-				<< "[train-cfg] log_every  = " << log_every << '\n'
+			    << "[train-cfg] log_every  = " << log_every << '\n'
 				<< "[train-cfg] save_path  = " << (save_path ? save_path->c_str() : "(none)") << '\n';
+			std::cout << "[train-cfg] lr_decay   = ";
+			if (lr_decay_stages.empty()) { std::cout << "(off)\n"; }
+			else
+			{
+				for (auto s : lr_decay_stages) std::cout << s << ' ';
+				std::cout << " × " << lr_decay_rate << "\n";
+			}
 		}
 	};
 

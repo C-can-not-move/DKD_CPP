@@ -26,9 +26,11 @@ int main()
 			torch::optim::SGDOptions(/*lr=*/0.05).momentum(0.9).weight_decay(5e-4));
 
 		dkd::train::TrainConfig cfg;
-		cfg.epochs = 5;              // 冒烟
+		cfg.epochs = 240;
 		cfg.batch_size = 64;
-		cfg.log_every = 100;
+		cfg.log_every = 200;                       // 别刷屏，782 批/epoch
+		cfg.lr_decay_stages = { 150, 180, 210 };
+		cfg.lr_decay_rate = 0.1;
 		cfg.print();
 
 		const auto res = dkd::train::train_classifier(
