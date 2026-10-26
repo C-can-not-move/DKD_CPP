@@ -6,26 +6,47 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	SetConsoleCP(CP_UTF8);
 #endif
-    auto a = dkd::model::h_resnet8x4(100);         // 随机初始化
-    dkd::model::save_checkpoint(a, "run/roundtrip");
+	try {
+		const auto cfg = dkd::cfg::defaults();
+		const auto device = cfg.device_index < 0
+			? torch::Device(torch::kCPU)
+			: torch::Device(torch::kCUDA, cfg.device_index);
 
-    auto b = dkd::model::h_resnet8x4(100);         // 另一份随机初始化，值必然不同
-    dkd::model::load_checkpoint(b, "run/roundtrip");
+		torch::manual_seed(cfg.seed);
 
-    std::unordered_map<std::string, torch::Tensor> tb;
-    for (auto& p : b->named_parameters()) tb.emplace(p.key(), p.value());
-    for (auto& x : b->named_buffers())    tb.emplace(x.key(), x.value());
+		const auto tr = dkd::data::load_cifar100_bin(cfg.data_dir, /*train=*/true);
+		const auto te = dkd::data::load_cifar100_bin(cfg.data_dir, /*train=*/false);
+		std::cout << "[data] train " << tr.images.size(0)<< "  test " << te.images.size(0) << "\n";
 
-    int64_t bad = 0;
-    auto cmp = [&](const std::string& k, const torch::Tensor& v)
-        {
-            if (!v.equal(tb.at(k))) { ++bad; std::cout << "  [roundtrip] 不一致 " << k << "\n"; }
-        };
-    for (auto& p : a->named_parameters()) cmp(p.key(), p.value());
-    for (auto& x : a->named_buffers())    cmp(x.key(), x.value());
+		auto model = dkd::model::h_resnet8x4(100);
+		model->to(device);
 
-    std::cout << "[roundtrip] " << (bad == 0 ? "全等 ✓" : "不一致 ✗")
-        << "   (" << tb.size() << " 个张量)\n";
+		torch::optim::SGD optimizer(
+			model->parameters(),
+			torch::optim::SGDOptions(/*lr=*/0.05).momentum(0.9).weight_decay(5e-4));
 
-    return 0;
+		dkd::train::TrainConfig tcfg;
+		tcfg.epochs = 240;
+		tcfg.batch_size = 64;
+		tcfg.log_every = 200;
+		tcfg.lr_decay_stages = { 150, 180, 210 };
+		tcfg.lr_decay_rate = 0.1;
+		tcfg.save_path = cfg.out_dir + "/resnet8x4-baseline";
+		tcfg.print();
+
+		const auto res = dkd::train::train_classifier(
+			model, 
+			tr.images, 
+			tr.labels, 
+			te.images, 
+			te.labels, 
+			optimizer, 
+			tcfg);
+		res.print();
+	}
+	catch (const std::exception& e) {
+		std::cerr << "ERROR: " << e.what() << "\n";
+		return 1;
+	}
+	return 0;
 }
