@@ -2,6 +2,7 @@
 #pragma once
 
 #include "model/resnet.h"
+#include "kd/loss.h"
 
 #include <torch/torch.h>
 #include <torch/optim.h>
@@ -81,6 +82,18 @@ namespace dkd::train
 		const torch::Tensor& val_labels,
 		torch::optim::Optimizer& optimizer,
 		const TrainConfig& cfg);
+
+	// 蒸馏训练一个学生分类器。
+	TrainResult train_distill(
+		dkd::model::ResNet student,
+		dkd::model::ResNet teacher,          // 多一个
+		const torch::Tensor& train_images,
+		const torch::Tensor& train_labels,
+		const torch::Tensor& val_images,
+		const torch::Tensor& val_labels,
+		torch::optim::Optimizer& optimizer,
+		const TrainConfig& cfg,              // 怎么训
+		const dkd::kd::DkdOpts& kd);         // 蒸什么
 
 	// 评估准确率，没有训练循环。
 	EvalResult evaluate(
