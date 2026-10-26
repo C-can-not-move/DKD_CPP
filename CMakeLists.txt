@@ -43,11 +43,13 @@ set(APP_SOURCES
     "src/data/transforms.h"
     "src/data/transforms.cpp"
     "src/model/resnet.h"
-    "src/model/resnet.cpp" 
+    "src/model/resnet.cpp"
+    "src/model/checkpoint.h"
+    "src/model/checkpoint.cpp"
     "src/kd/loss.h" 
     "src/kd/loss.cpp" 
     "src/train/trainer.h"
-    "src/train/trainer.cpp")
+    "src/train/trainer.cpp" )
 add_executable(DKD_C++ ${APP_SOURCES})
 
 # ==================== target 属性（必须在 add_executable 之后）====================

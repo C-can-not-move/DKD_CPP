@@ -11,11 +11,16 @@
 #include <iomanip>
 #include <string>
 
+#include <fstream>
+#include <set>
+#include <cstdio>
+
 #include <torch/torch.h>
 
 #include "config.h"
 #include "data/cifar100.h"
 #include "data/transforms.h"
 #include "model/resnet.h"
+#include "model/checkpoint.h"
 #include "kd/loss.h"
 #include "train/trainer.h"
