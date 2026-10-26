@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <filesystem>
 
 namespace dkd::model
 {
@@ -99,6 +100,10 @@ namespace dkd::model
 	void save_checkpoint(const ResNet& model, const std::string& base)
 	{
 		const auto tensors = flatten(model);
+
+		// ofstream 不会建目录 —— ./run 不存在就直接失败。这一步交给保存方，别让调用者各建一次。
+		const auto parent = std::filesystem::path(base + ".txt").parent_path();
+		if (!parent.empty()) std::filesystem::create_directories(parent);
 
 		std::ofstream txt(base + ".txt", std::ios::binary);
 		std::ofstream bin(base + ".bin", std::ios::binary);

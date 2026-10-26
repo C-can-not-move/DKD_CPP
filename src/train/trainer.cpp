@@ -1,6 +1,7 @@
 ﻿#include "train/trainer.h"
 
 #include "data/transforms.h"
+#include "model/checkpoint.h"
 
 #include <algorithm>
 #include <unordered_set>
@@ -106,6 +107,12 @@ namespace dkd::train
 			{
 				res.best_val_acc = acc;
 				res.best_epoch = epoch;
+
+				if (cfg.save_path)
+				{
+					dkd::model::save_checkpoint(model, *cfg.save_path);
+					std::cout << "  → best so far, saved -> " << *cfg.save_path << ".{txt,bin}\n";
+				}
 			}
 
 			std::cout << "[epoch " << epoch << "/" << cfg.epochs << "]"
